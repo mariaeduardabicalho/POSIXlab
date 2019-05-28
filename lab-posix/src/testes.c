@@ -53,6 +53,6 @@ int test72() {
 
 
 
-test_list = { TEST(test1), TEST(test2), TEST(test3), TEST(test46),TEST(test5),TEST(test71),TEST(test72)};
-
+test_list = { TEST(test1,5), TEST(test2,5), TEST(test3,5), TEST(test46,5),TEST(test5,5),TEST(test71,5),TEST(test72,5)};
+//checklist={0,0,0,0,0,0,0};
 #include "mintest/runner.h"
