@@ -1,4 +1,13 @@
+void sig_handler(int num){
+    printf("\033[0m");
+    printf(" Confirmacao de saida\n");
+    sleep(1);
+    exit(0);
+}
+
 int main() {
+
+
   
     int size = sizeof(all_tests)/sizeof(test_data);
     printf("Running %d tests:\n", size);
@@ -15,8 +24,19 @@ int main() {
     char bufs;
     int fds[size];
 
+    /// sinal crtl-c
 
-    
+    struct sigaction s;
+    s.sa_handler = sig_handler;
+    sigemptyset(&s.sa_mask);
+    s.sa_flags=0;
+    sigaction(SIGINT,&s,NULL);
+
+    // timer
+    struct tms t;
+    clock_t dub;
+    int tics_per_second;
+    tics_per_second = sysconf(_SC_CLK_TCK);
 
 
     // criacao dos forks e wait
@@ -64,7 +84,21 @@ int main() {
             printf("%c",bufs);
 
         }
-        //printf("\033[0m Tempo decorrido: %d\n",);
+        if ((dub = times(&t)) == -1){
+             perror("times() error");
+        }
+        else{
+            //printf("\033[0m Tempo decorrido: %d\n",);
+            printf("\033[0m             utime           stime\n");
+            printf("tempo:     %f        %f\n",
+            ((double) t.tms_cutime)/tics_per_second,
+            ((double) t.tms_cstime/tics_per_second));
+
+        }
+           
+        
+        
+
     }
 
     printf("\033[0m \n\n=====================\n");

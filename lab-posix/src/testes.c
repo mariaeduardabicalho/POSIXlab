@@ -10,7 +10,8 @@ int test1() {
 
 int test2() {
     //printf("divissao por zero\n");
-    int i = 10/0 ;
+    int i = 10/0;
+    printf("%d",i);
     return 0;
     // nem preciso de trst assert ??
 }
