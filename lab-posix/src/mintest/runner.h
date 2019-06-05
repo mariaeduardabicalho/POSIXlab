@@ -19,7 +19,7 @@ int main() {
     pid_t w[size];
     int wstatus;
 
-    // Inicializações para pipes
+    // Inicializações para arquivo
 
     char bufs;
     int fds[size];
@@ -49,7 +49,7 @@ int main() {
         
         
         if(f[i] == 0){
-            alarm(1);
+            alarm(all_tests[i].time);
             dup2(fds[i],1);
             if (all_tests[i].function() >= 0) {
                 printf("\033[0;32m %s:  [PASS]\n", all_tests[i].name);
