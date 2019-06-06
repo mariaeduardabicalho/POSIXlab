@@ -7,7 +7,7 @@ void sig_handler(int num){
 
 int main() {
 
-
+    
   
     int size = sizeof(all_tests)/sizeof(test_data);
     printf("Running %d tests:\n", size);
@@ -18,29 +18,27 @@ int main() {
     pid_t f[size];  
     pid_t w[size];
     int wstatus;
+    int j;
 
     // Inicializações para arquivo
 
-    char bufs;
+   
     int fds[size];
 
-    /// sinal crtl-c
+    // /// sinal crtl-c
 
-    struct sigaction s;
-    s.sa_handler = sig_handler;
-    sigemptyset(&s.sa_mask);
-    s.sa_flags=0;
-    sigaction(SIGINT,&s,NULL);
+    // struct sigaction s;
+    // s.sa_handler = sig_handler;
+    // sigemptyset(&s.sa_mask);
+    // s.sa_flags=0;
+    // sigaction(SIGINT,&s,NULL);
 
-    // timer
-    struct tms t;
-    clock_t dub;
-    int tics_per_second;
-    tics_per_second = sysconf(_SC_CLK_TCK);
+
 
 
     // criacao dos forks e wait
-
+    clock_t inicial = clock();
+    int msec = 0;
     for (int i = 0; i < size; i++) {
         fds[i]= open("/tmp", O_TMPFILE | O_RDWR, 0600);
         
@@ -48,57 +46,53 @@ int main() {
         printf("\033[0m");
         
         
+        
         if(f[i] == 0){
+
             alarm(all_tests[i].time);
             dup2(fds[i],1);
             if (all_tests[i].function() >= 0) {
-                printf("\033[0;32m %s:  [PASS]\n", all_tests[i].name);
+                
                 return 0;
             }; 
+           
             return -1;
         }
         
     }
 
     for (int i = 0; i < size; i++) {
-        
-        
-        w[i]=  waitpid(f[i],&wstatus,NULL);  
-        
+         char bufs = NULL;
+        //w[i]=  waitpid(f[i],&wstatus,NULL);  
+        w[i]= wait(&wstatus);
+        for (j = 0; j < size; j++){
+            if(w[i]==f[j]){
+                break;
+            }   
+        }
+                
         if (WIFEXITED(wstatus)){
-            printf("\033[0m %s exited, status= %d\n",all_tests[i].name, WEXITSTATUS(wstatus)); 
+            printf("\033[0m %s exited, status= %d\n",all_tests[j].name, WEXITSTATUS(wstatus)); 
             if(WEXITSTATUS(wstatus) == 0){
                 pass_count++;
             }
             
         } 
         if(WIFSIGNALED(wstatus)){
-            printf("\033[0m %s : \033[0;31m [FAIL] com sinal: %s\n \n ",all_tests[i].name,strsignal(WTERMSIG(wstatus)));
+            printf("\033[0m %s : \033[0;31m [FAIL] com sinal: %s\n \n ",all_tests[j].name,strsignal(WTERMSIG(wstatus)));
         }
+        printf("\033[0;32m %s:  [PASS]\n", all_tests[i].name);
+        clock_t difference = clock() - inicial;
+        msec = difference * 1000 / CLOCKS_PER_SEC;
+        printf("\033[0mTempo --->%d seconds:%dmilliseconds\n",
+        msec/1000, msec%1000);
          
-       
-        lseek(fds[i],0,SEEK_SET);
-        
-        while(read(fds[i],&bufs,1)>0){
-    
+        lseek(fds[j],0,SEEK_SET);
+
+        while(read(fds[j],&bufs,1)>0){
             printf("%c",bufs);
-
         }
-        if ((dub = times(&t)) == -1){
-             perror("times() error");
-        }
-        else{
-            //printf("\033[0m Tempo decorrido: %d\n",);
-            printf("\033[0m             utime           stime\n");
-            printf("tempo:     %f        %f\n",
-            ((double) t.tms_cutime)/tics_per_second,
-            ((double) t.tms_cstime/tics_per_second));
-
-        }
-           
-        
-        
-
+    
     }
 
     printf("\033[0m \n\n=====================\n");

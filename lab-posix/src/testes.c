@@ -27,7 +27,7 @@ int test3() {
 int test46() {
     //tipo teste  4 e 6
     int t;
-    for(int i=0; i<20000; i++){
+    for(int i=0; i<20; i++){
         t+=i;
         printf("%d",i);
     }
