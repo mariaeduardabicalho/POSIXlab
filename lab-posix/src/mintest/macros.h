@@ -27,19 +27,12 @@ typedef struct {
 
 #define test_assert(expr, str) { if(!(expr)) { printf("\033[0;31m %s: [FAIL] %s in %s:%d\n", __func__, str, __FILE__, __LINE__); return -1; } }
 
-#define TEST(f,t) {.name=#f, .function=f,.time=t}
+#define TEST(f) {.name=#f, .function=f,.time=5}
+
+//API tempo
+
+#define TEST_TIME(f,t) {.name=#f, .function=f,.time=t}
 
 #define test_list test_data all_tests[]
 
-//#define checklist int check[]
-int check[7];
-
-void api_tempo(int id,int te){
-    
-    if(check[id]==id){
-        return;
-    } 
-    alarm(te);
-    check[id]=id;
-}
 

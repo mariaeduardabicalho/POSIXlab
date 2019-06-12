@@ -24,19 +24,7 @@ int main() {
     char bufs;
     int fds[size];
 
-    /// sinal crtl-c
-
-    struct sigaction s;
-    s.sa_handler = sig_handler;
-    sigemptyset(&s.sa_mask);
-    s.sa_flags=0;
-    sigaction(SIGINT,&s,NULL);
-
-    // timer
-    struct tms t;
-    clock_t dub;
-    int tics_per_second;
-    tics_per_second = sysconf(_SC_CLK_TCK);
+   
 
 
     // criacao dos forks e wait
@@ -49,7 +37,7 @@ int main() {
         
         
         if(f[i] == 0){
-            api_tempo(i,all_tests[i].time);
+            alarm(all_tests[i].time);
             dup2(fds[i],1);
             if (all_tests[i].function() >= 0) {
                 printf("\033[0;32m %s:  [PASS]\n", all_tests[i].name);
@@ -84,17 +72,7 @@ int main() {
             printf("%c",bufs);
 
         }
-        if ((dub = times(&t)) == -1){
-             perror("times() error");
-        }
-        else{
-            //printf("\033[0m Tempo decorrido: %d\n",);
-            printf("\033[0m             utime           stime\n");
-            printf("tempo:     %f        %f\n",
-            ((double) t.tms_cutime)/tics_per_second,
-            ((double) t.tms_cstime/tics_per_second));
-
-        }
+        
            
         
         
