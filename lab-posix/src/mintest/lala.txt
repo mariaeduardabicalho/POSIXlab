@@ -1,0 +1,61 @@
+#include <stdlib.h>
+#include <pthread.h>
+#include <stdio.h>
+#include <semaphore.h>
+
+typedef struct  {
+    float *l;
+    int inicio;
+    int fim;
+}alista;
+
+float soma=0;
+
+void *somavetor(void *_arg){
+    alista *al = (alista*) _arg; 
+    for(int i =al->inicio; i<al->fim;i++){
+        printf("%d",i);
+        soma+=al->l[i];
+    }
+}   
+
+int main(){
+
+    int n;
+    float v;
+    printf("Digite um numero:");
+    scanf(" %d",&n);
+    float *vec = malloc(n*sizeof(float));
+    for(int i =0; i<n;i++){
+        printf("Digite um numero:");
+        scanf("%f",&v);
+        vec[i]=v;
+    }
+
+    pthread_t *tids = malloc(2 * sizeof(pthread_t));
+   
+    //structs
+    alista *al1 = malloc(sizeof(alista));
+    al1->l= vec;
+    al1->inicio=0;
+    al1->fim=n/2;
+   
+    
+    alista *al2 = malloc(sizeof(alista));
+    al2->l= vec;
+    al2->inicio=n/2;
+    al2->fim=n;
+
+    
+    pthread_create(&tids[0], NULL, somavetor, al1);
+    pthread_create(&tids[1], NULL, somavetor, al2);
+  
+
+    pthread_join(tids[0], NULL);
+    pthread_join(tids[1], NULL);
+
+    printf("soma:%f",soma);
+
+
+    return 0;
+}
